@@ -50,12 +50,18 @@ int dec2bcd(byte num)
   return ((num/10 * 16) + (num % 10));
 }
 
+void Nothing()
+{
+  //Do nothing
+}
+
 void Hen_Gio()
 {
-  if(((hour == 3) && (minute == 0)) || ((hour == 7) && (minute == 0)) || ((hour == 11) && (minute == 0)) || ((hour == 15) && (minute == 0)) || ((hour == 19) && (minute == 0)) || ((hour == 23) && (minute == 0)))  
+  if(((hour == 3) && (minute == 0)) || ((hour == 7) && (minute == 0)) || ((hour == 11) && (minute == 0)) || ((hour == 15) && (minute == 00)) || ((hour == 19) && (minute == 0)) || ((hour == 23) && (minute == 0)))  
   {
     Serial.print('t');
     Serial.print('4');
+    Nothing();
   }
 }
 /* cài đặt thời gian cho DS1307 */
@@ -73,16 +79,39 @@ void setTime(byte hr, byte min, byte sec, byte wd, byte d, byte mth, byte yr)
   Wire.endTransmission();
 }
 
+void digitalClockDisplay(){
+    // digital clock display of the time
+    Serial.print(hour);
+    printDigits(minute);
+    printDigits(second);
+    Serial.print(" ");
+    Serial.print(day);
+    Serial.print(" ");
+    Serial.print(month);
+    Serial.print(" ");
+    Serial.print(year); 
+    Serial.println(); 
+}
+ 
+void printDigits(int digits){
+    // các thành phần thời gian được ngăn chách bằng dấu :
+    Serial.print(":");
+        
+    if(digits < 10)
+        Serial.print('0');
+    Serial.print(digits);
+}
+
+
 void setup() 
 {
   Wire.begin();
-  setTime(9, 0, 0, 5, 27, 6, 19); // 09:00:00 T5 26-06-2019
+  setTime(16, 20, 0, 6, 28, 6, 19); // 09:10:00 T6 28-06-2019
   Serial.begin(9600);
   pinMode(Reset, INPUT);
   digitalWrite(Reset, LOW);
   pinMode(van, OUTPUT);
   digitalWrite(van, LOW);
-  setTime(12, 30, 45, 1, 8, 2, 15); // 12:30:45 CN 08-02-2015
   Servo1.attach(S1);
   Servo2.attach(S2);
   Servo3.attach(S3);
@@ -94,6 +123,8 @@ void loop()
    /* Đọc dữ liệu của DS1307 */
   readDS1307();
   Hen_Gio();
+  digitalClockDisplay();
+  delay(1000);
   
   if (digitalRead(Reset) == HIGH)
   {

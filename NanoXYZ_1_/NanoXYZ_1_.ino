@@ -81,8 +81,8 @@ void setup()
   stepperA.setAcceleration(5000); // chinh gia toc driver 1
   stepperB.setMaxSpeed(5000);  //chỉnh tốc độ driver 2 
   stepperB.setAcceleration(5000); // chinh gia toc driver 2
-  stepperC.setMaxSpeed(5000);  //chỉnh tốc độ driver 3 
-  stepperC.setAcceleration(5000); // chinh gia toc driver 3
+  stepperC.setMaxSpeed(7000);  //chỉnh tốc độ driver 3 
+  stepperC.setAcceleration(7000); // chinh gia toc driver 3
 }
 
 void ReceiveEvent(int n)
@@ -129,6 +129,21 @@ ISR (SPI_STC_vect)
 
 void Return_Zero()
 {
+  while (digitalRead(magneticS3) == 1)
+  {
+    c = c + 50;
+    DongCoC = 10;
+    while(DongCoC == 10) //trở về vị trí ban đầu
+    {
+      truc3 = c;
+      stepperC.moveTo(truc3);
+      stepperC.run();
+      if (stepperC.distanceToGo() == 0)
+      {
+        DongCoC = 0;
+      }
+    }
+  }
   while (digitalRead(magneticS1) == 1) // không ở vị trí bắt đầu
   {
   	a = a + 50;
@@ -161,19 +176,80 @@ void Return_Zero()
       }
     }
   }
-  while (digitalRead(magneticS3) == 1)
+}
+
+void A15() //Tưới sau khi đo
+{
+  while(DongCoA == 15) 
   {
-  	c = c + 50;
-  	DongCoC = 9;
-    while(DongCoC == 9) //trở về vị trí ban đầu
+    stepperA.moveTo(q - tuoiSDA);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
     {
-      truc3 = c;
-      stepperC.moveTo(truc3);
-      stepperC.run();
-      if (stepperC.distanceToGo() == 0)
+      DongCoA = 0;
+      mySerial.print(5);
+      DongCoC = 9;
+      C9();
+    }
+  }
+}
+
+void C5() //Đo độ ẩm
+{
+  while(DongCoC == 5) 
+  {
+    stepperC.moveTo(doam + truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0) 
+    {
+      Serial.print('h');
+      Serial.print(z);
+      delay(5000);
+      DongCoC = 8;
+    }
+  }
+}
+
+void C9()
+{
+  while(DongCoC == 9)
+  {
+    if(mySerial.available() > 1)
+    {
+      m[0] = mySerial.read();
+      if (m[0] == 't')
       {
-        DongCoC = 0;
+        m[1] = mySerial.read();
+        if (m[1] == '1')
+        {
+          DongCoC = 7;
+        }
+        if (m[1] == '2')
+        {
+          DongCoC = 0;
+          Return_Zero();
+        }
+        if (m[1] == '3')
+        {
+          DongCoA = 16;
+          DongCoC = 0;
+          A16();
+        }
       }
+    }
+  }  
+}
+
+void A16() //về vị trí ban nãy
+{
+  while(DongCoA == 16) //về lại vị trí ban nãy
+  {
+    stepperA.moveTo(q);
+    stepperA.run();
+    q = 0;
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
     }
   }
 }
@@ -182,206 +258,805 @@ void Check_Humility()
 {
   Return_Zero();
   DongCoA = 7; //x1
+  while(DongCoA == 7) //tọa độ x1
+  {
+    q = a1 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   DongCoB = 7; //y1
+  while(DongCoB == 7) //tọa độ y1
+  {
+    stepperB.moveTo(b1 + truc2);
+    stepperB.run();
+    if (stepperB.distanceToGo() == 0) 
+    {
+      DongCoB = 0;
+    }
+  }  
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
-  }	
+  }
+  q = 0;	
   DongCoA = 9; //x2
+  while(DongCoA == 9) //tọa độ x2
+  {
+    q = a2 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 10; //x3
+  while(DongCoA == 10) //tọa độ x3
+  {
+    q = a3 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 11; //x4
+  while(DongCoA == 11) //tọa độ x4
+  {
+    q = a4 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 12; //x5, thêm DongCoA = 13 để trở về vị trí x1
+  while(DongCoA == 12) //tọa độ x5
+  {
+    q = a5 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
+  }
+  q = 0;
+  DongCoA = 13; //về lại x1
+  while(DongCoA == 13) //tọa độ x1
+  {
+    q = a1 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
   }
   DongCoB = 9; //y2
+  while(DongCoB == 9) //tọa độ y2
+  {
+    stepperB.moveTo(b2 + truc2);
+    stepperB.run();
+    if (stepperB.distanceToGo() == 0) 
+    {
+      DongCoB = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 9; //x2
+  while(DongCoA == 9) //tọa độ x2
+  {
+    q = a2 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 10; //x3
+  while(DongCoA == 10) //tọa độ x3
+  {
+    q = a3 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 11; //x4
+  while(DongCoA == 11) //tọa độ x4
+  {
+    q = a4 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 12; //x5
+  while(DongCoA == 12) //tọa độ x5
+  {
+    q = a5 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
+  }
+  q = 0;
+  DongCoA = 13; //về lại x1
+  while(DongCoA == 13) //tọa độ x1
+  {
+    q = a1 + truc1;
+    stepperA.moveTo(a1 + truc1);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
   }
   DongCoB = 10; //y3
+  while(DongCoB == 10) //tọa độ y3
+  {
+    stepperB.moveTo(b3 + truc2);
+    stepperB.run();
+    if (stepperB.distanceToGo() == 0) 
+    {
+      DongCoB = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 9; //x2
+  while(DongCoA == 9) //tọa độ x2
+  {
+    q = a2 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 10; //x3
+  while(DongCoA == 10) //tọa độ x3
+  {
+    q = a3 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 11; //x4
+  while(DongCoA == 11) //tọa độ x4
+  {
+    q = a4 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 12; //x5
+  while(DongCoA == 12) //tọa độ x5
+  {
+    q = a5 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3 + truc1);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
+  }
+  q = 0;
+  DongCoA = 13; //về lại x1
+  while(DongCoA == 13) //tọa độ x1
+  {
+    q = a1 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
   }
   DongCoB = 11; //y4
+  while(DongCoB == 11) //tọa độ y4
+  {
+    stepperB.moveTo(b4 + truc2);
+    stepperB.run();
+    if (stepperB.distanceToGo() == 0) 
+    {
+      DongCoB = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 9; //x2
+  while(DongCoA == 9) //tọa độ x2
+  {
+    q = a2 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 10; //x3
+  while(DongCoA == 10) //tọa độ x3
+  {
+    q = a3 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 11; //x4
+  while(DongCoA == 11) //tọa độ x4
+  {
+    q = a4 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 12; //x5
+  while(DongCoA == 12) //tọa độ x5
+  {
+    q = a5 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
+  }
+  q = 0;
+  DongCoA = 13; //về lại x1
+  while(DongCoA == 13) //tọa độ x1
+  {
+    q = a1 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
   }
   DongCoB = 12; //y5
+  while(DongCoB == 12) //tọa độ y5
+  {
+    stepperB.moveTo(b5 + truc2);
+    stepperB.run();
+    if (stepperB.distanceToGo() == 0) 
+    {
+      DongCoB = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 9; //x2
+  while(DongCoA == 9) //tọa độ x2
+  {
+    q = a2 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 10; //x3
+  while(DongCoA == 10) //tọa độ x3
+  {
+    q = a3 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 11; //x4
+  while(DongCoA == 11) //tọa độ x4
+  {
+    q = a4 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   DongCoA = 12; //x5
+  while(DongCoA == 12) //tọa độ x5
+  {
+    q = a5 + truc1;
+    stepperA.moveTo(q);
+    stepperA.run();
+    if (stepperA.distanceToGo() == 0)
+    {
+      DongCoA = 0;
+    }
+  }
   z += 1;
   DongCoC = 5;
+  C5();
+  while(DongCoC == 8) 
+  {
+    stepperC.moveTo(truc3);
+    stepperC.run();
+    if (stepperC.distanceToGo() == 0)
+    {
+      DongCoC = 0;
+    }
+  }
   while (humid < 70)
   {
     DongCoA = 15;
+    A15();
   	break;
   }
+  q = 0;
   z = 0;
   Return_Zero();  
 }
@@ -400,10 +1075,10 @@ void loop()
     count = 0;
     Serial.println(x);
     Serial.println(y);
-    stepperA.moveTo((125/9)*x);
+    stepperA.moveTo(270*x);
     stepperA.run();
     delay(4000);
-    stepperB.moveTo((125/9)*y);
+    stepperB.moveTo(550*y);
     stepperB.run();
     x = y = 0;
   }
@@ -1310,91 +1985,10 @@ void loop()
       q = 0;
 	    mySerial.print(7);
       DongCoA = 0;
-      DongCoC = 9;
+      C9();
   	}
   }
-  while(DongCoA == 7) //tọa độ x1
-  {
-    q = a1 + truc1;
-  	stepperA.moveTo(q);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 0;
-  	}
-  }
-  while(DongCoA == 9) //tọa độ x2
-  {
-    q = a2 + truc1;
-  	stepperA.moveTo(q);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 0;
-  	}
-  }
-  while(DongCoA == 10) //tọa độ x3
-  {
-    q = a3 + truc1;
-  	stepperA.moveTo(q);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 0;
-  	}
-  }
-  while(DongCoA == 11) //tọa độ x4
-  {
-    q = a4 + truc1;
-  	stepperA.moveTo(q);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 0;
-  	}
-  }
-  while(DongCoA == 12) //tọa độ x5
-  {
-    q = a5 + truc1;
-  	stepperA.moveTo(q);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 13;
-  	}
-  }
-  while(DongCoA == 13) //tọa độ x1
-  {
-  	stepperA.moveTo(a5 - a1);
-  	stepperA.run();
-  	if (stepperA.distanceToGo() == 0)
-  	{
-  	  DongCoA = 0;
-  	}
-  }
-  while(DongCoA == 15) //tưới sau khi đo
-  {
-    stepperA.moveTo(q - tuoiSDA);
-    stepperA.run();
-    if (stepperA.distanceToGo() == 0)
-    {
-      DongCoA = 0;
-      mySerial.print(5);
-      DongCoC = 9;
-    }
-  }
-  while(DongCoA == 16) //về lại vị trí ban nãy
-  {
-    stepperA.moveTo(q);
-    stepperA.run();
-    q = 0;
-    if (stepperA.distanceToGo() == 0)
-    {
-      DongCoA = 0;
-    }
-  }
-  
-    
+   
   //Dong co B, truc y
   while(DongCoB == 1) 
   {
@@ -1441,51 +2035,6 @@ void loop()
       DongCoB = 0;
     }
   }
-  while(DongCoB == 7) //tọa độ y1
-  {
-    stepperB.moveTo(b1 + truc2);
-    stepperB.run();
-    if (stepperB.distanceToGo() == 0) 
-    {
-      DongCoB = 0;
-    }
-  }
-  while(DongCoB == 9) //tọa độ y2
-  {
-    stepperB.moveTo(b2 + truc2);
-    stepperB.run();
-    if (stepperB.distanceToGo() == 0) 
-    {
-      DongCoB = 0;
-    }
-  }
-  while(DongCoB == 10) //tọa độ y3
-  {
-    stepperB.moveTo(b3 + truc2);
-    stepperB.run();
-    if (stepperB.distanceToGo() == 0) 
-    {
-      DongCoB = 0;
-    }
-  }
-  while(DongCoB == 11) //tọa độ y4
-  {
-    stepperB.moveTo(b4 + truc2);
-    stepperB.run();
-    if (stepperB.distanceToGo() == 0) 
-    {
-      DongCoB = 0;
-    }
-  }
-  while(DongCoB == 12) //tọa độ y5
-  {
-    stepperB.moveTo(b5 + truc2);
-    stepperB.run();
-    if (stepperB.distanceToGo() == 0) 
-    {
-      DongCoB = 0;
-    }
-  }
   
   //Dong Co C, truc z
   while(DongCoC == 1) 
@@ -1495,7 +2044,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(1);
-      DongCoC = 9;
+      C9();
     }
   }
   while(DongCoC == 2) 
@@ -1505,7 +2054,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(2);
-      DongCoC = 9;
+      C9();
     }
   }
   while(DongCoC == 3) 
@@ -1515,7 +2064,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(3);
-      DongCoC = 9;
+      C9();
     }
   }
   while(DongCoC == 4) 
@@ -1525,18 +2074,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(4);
-      DongCoC = 9;
-    }
-  }
-  while(DongCoC == 5) 
-  {
-    stepperC.moveTo(doam + truc3);
-    stepperC.run();
-    if (stepperC.distanceToGo() == 0) 
-    {
-	    Serial.print('h');
-      Serial.print(z);
-      delay(5000);
+      C9();
     }
   }
   while(DongCoC == 6) 
@@ -1556,40 +2094,6 @@ void loop()
     {
 	    DongCoA = 6;
       DongCoC = 0;
-    }
-  }
-  while(DongCoC == 8) 
-  {
-    stepperC.moveTo(truc3);
-    stepperC.run();
-    if (stepperC.distanceToGo() == 0)
-    {
-      DongCoC = 0;
-    }
-  }
-  while(DongCoC == 9)
-  {
-    if(mySerial.available() > 1)
-    {
-      m[0] = mySerial.read();
-      if (m[0] == 't')
-      {
-        m[1] = mySerial.read();
-        if (m[1] == '1')
-        {
-          DongCoC = 7;
-        }
-        if (m[1] == '2')
-        {
-          DongCoC = 0;
-          Return_Zero();
-        }
-        if (m[1] == '3')
-        {
-          DongCoA = 16;
-          DongCoC = 0;
-        }
-      }
     }
   }      
 }

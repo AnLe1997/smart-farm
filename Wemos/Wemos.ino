@@ -98,7 +98,7 @@ void UpHumility_ToServer(int id, int humi, double time_late_ms)
 }
 
 //HÀM ĐẨY ĐỘ TĂNG TRƯỞNG LÊN WEBSERVER
-void UpGrowth_ToServer(String growth, double time_late_ms)
+void UpGrowth_ToServer(int id, String growth, double time_late_ms)
 {
   delay(10);
 
@@ -913,17 +913,17 @@ void loop()
         if(m[2] == '1')
         {
           growth = "small";
-          UpGrowth_ToServer((String) growth, 100);
+          UpGrowth_ToServer((int) id, (String) growth, 100);
         }
         if(m[2] == '2')
         {
           growth = "normal";
-          UpGrowth_ToServer((String) growth, 100);
+          UpGrowth_ToServer((int) id, (String) growth, 100);
         }
         if(m[2] == '3')
         {
           growth = "big";
-          UpGrowth_ToServer((String) growth, 100);
+          UpGrowth_ToServer((int) id, (String) growth, 100);
         }
       }
   	}
