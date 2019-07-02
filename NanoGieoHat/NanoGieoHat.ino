@@ -57,7 +57,7 @@ void Nothing()
 
 void Hen_Gio()
 {
-  if(((hour == 3) && (minute == 0)) || ((hour == 7) && (minute == 0)) || ((hour == 11) && (minute == 0)) || ((hour == 15) && (minute == 00)) || ((hour == 19) && (minute == 0)) || ((hour == 23) && (minute == 0)))  
+  if(((hour == 3) && (minute == 0)) || ((hour == 7) && (minute == 0)) || ((hour == 11) && (minute == 0)) || ((hour == 15) && (minute == 0)) || ((hour == 19) && (minute == 0)) || ((hour == 23) && (minute == 0)))  
   {
     Serial.print('t');
     Serial.print('4');
@@ -106,7 +106,7 @@ void printDigits(int digits){
 void setup() 
 {
   Wire.begin();
-  setTime(16, 20, 0, 6, 28, 6, 19); // 09:10:00 T6 28-06-2019
+  //setTime(14, 32, 0, 3, 2, 7, 19); // 15:41:00 T2 01-07-2019
   Serial.begin(9600);
   pinMode(Reset, INPUT);
   digitalWrite(Reset, LOW);

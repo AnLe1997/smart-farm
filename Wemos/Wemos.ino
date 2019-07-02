@@ -69,9 +69,9 @@ void UpHumility_ToServer(int id, int humi, double time_late_ms)
 
   // We now create a URI for the request
   String url = "/hienthi/index.php?";
-  url += "Position";
+  url += "id=";
   url += id;
-  url += "Do am=";
+  url += "&humi=";
   url += humi;
 
   // This will send the request to the server
@@ -111,9 +111,9 @@ void UpGrowth_ToServer(int id, String growth, double time_late_ms)
 
   // We now create a URI for the request
   String url = "/hienthi/growth_index.php?";
-  url += "Position";
+  url += "id=";
   url += id;
-  url += "Growth =";
+  url += "&size=";
   url += size;
 
   // This will send the request to the server
@@ -899,7 +899,7 @@ void loop()
       m[2] = Serial.read();
       id = m[1]*10 + m[2];
       Humility();
-  	  UpHumility_ToServer((int)id, (int) humi, 100);
+  	  UpHumility_ToServer((int) id, (int) humi, 100);
       Serial.print('f');
       Serial.print(humi);
     
@@ -912,17 +912,17 @@ void loop()
         m[2] = Serial.read();
         if(m[2] == '1')
         {
-          growth = "small";
+          size = "small";
           UpGrowth_ToServer((int) id, (String) growth, 100);
         }
         if(m[2] == '2')
         {
-          growth = "normal";
+          size = "normal";
           UpGrowth_ToServer((int) id, (String) growth, 100);
         }
         if(m[2] == '3')
         {
-          growth = "big";
+          size = "big";
           UpGrowth_ToServer((int) id, (String) growth, 100);
         }
       }

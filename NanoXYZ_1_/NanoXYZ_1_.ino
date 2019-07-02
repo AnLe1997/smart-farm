@@ -47,11 +47,11 @@ int dietco = -13500;
 int tuoiSDA = 3850;
 //Trục x, y đo độ ẩm và tưới
 int kcdoam = 350;
-int a1 = 16650;
-int a2 = 13450;
-int a3 = 10250;
-int a4 = 7050;
-int a5 = 3850;
+int a1 = 16750;
+int a2 = 13550;
+int a3 = 10350;
+int a4 = 7150;
+int a5 = 3950;
 int b1 = 17900;
 int b2 = 14100;
 int b3 = 10300;
@@ -62,6 +62,8 @@ void setup()
 {
   Serial.begin(9600);
   mySerial.begin(9600);
+  Wire.begin(0x08);
+  Wire.onReceive(ReceiveEvent);
   pinMode(magneticS1, INPUT);
   digitalWrite(magneticS1, HIGH); // ko phát hiện từ
   pinMode(magneticS2, INPUT);
@@ -90,6 +92,7 @@ void ReceiveEvent(int n)
   while (Wire.available())
   {
     p = Wire.read();   //receive byte as an integer
+    Serial.print(p);
   }
 }
 
@@ -723,7 +726,7 @@ void Check_Humility()
   C5();
   while(DongCoC == 8) 
   {
-    stepperC.moveTo(truc3 + truc1);
+    stepperC.moveTo(truc3);
     stepperC.run();
     if (stepperC.distanceToGo() == 0)
     {
@@ -1073,8 +1076,8 @@ void loop()
   if (count > 0 && val == 0)
   {
     count = 0;
-    Serial.println(x);
-    Serial.println(y);
+    Serial.println(270*x);
+    Serial.println(270*y);
     stepperA.moveTo(270*x);
     stepperA.run();
     delay(4000);
@@ -1985,6 +1988,7 @@ void loop()
       q = 0;
 	    mySerial.print(7);
       DongCoA = 0;
+      DongCoC = 9;
       C9();
   	}
   }
@@ -2044,6 +2048,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(1);
+      DongCoC = 9;
       C9();
     }
   }
@@ -2054,6 +2059,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(2);
+      DongCoC = 9;
       C9();
     }
   }
@@ -2064,6 +2070,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(3);
+      DongCoC = 9;
       C9();
     }
   }
@@ -2074,6 +2081,7 @@ void loop()
     if (stepperC.distanceToGo() == 0) 
     {
       mySerial.print(4);
+      DongCoC = 9;
       C9();
     }
   }
