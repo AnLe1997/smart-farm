@@ -106,7 +106,7 @@ void printDigits(int digits){
 void setup() 
 {
   Wire.begin();
-  //setTime(14, 32, 0, 3, 2, 7, 19); // 15:41:00 T2 01-07-2019
+  setTime(15, 0, 0, 6, 5, 7, 19); // 11:17:00 T5 04-07-2019
   Serial.begin(9600);
   pinMode(Reset, INPUT);
   digitalWrite(Reset, LOW);

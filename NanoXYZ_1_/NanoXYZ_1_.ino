@@ -20,8 +20,8 @@ int x = 0, y = 0;
 uint8_t val = 0, count = 0;
 byte degree;
 
-int humid;
-int z = 0; //đếm số vị trí từ 1 đến 25
+unsigned char humid;
+unsigned char z = 0; //đếm số vị trí từ 1 đến 25
 byte p;
 
 // Khai bao chan cap xung cho driver servo
@@ -52,11 +52,11 @@ int a2 = 13550;
 int a3 = 10350;
 int a4 = 7150;
 int a5 = 3950;
-int b1 = 17900;
-int b2 = 14100;
+int b1 = 18000;
+int b2 = 14200;
 int b3 = 10300;
-int b4 = 6500;
-int b5 = 2700;
+int b4 = 6600;
+int b5 = 2800;
 
 void setup()
 {
@@ -181,6 +181,21 @@ void Return_Zero()
   }
 }
 
+void SendH()
+{
+  if (Serial.available() > 2)
+  {
+    k[0] = Serial.read();
+    if(k[0] == 'f')
+    {
+      k[1] = Serial.read() - 48;
+      k[2] = Serial.read() - 48;
+      humid = k[1]*10 + k[2];
+      Serial.print(humid);
+    }
+  }
+}
+
 void A15() //Tưới sau khi đo
 {
   while(DongCoA == 15) 
@@ -206,9 +221,9 @@ void C5() //Đo độ ẩm
     if (stepperC.distanceToGo() == 0) 
     {
       Serial.print('h');
-      Serial.print(z);
-      delay(5000);
+      Serial.println(z);
       DongCoC = 8;
+      delay(2000);
     }
   }
 }
@@ -234,27 +249,12 @@ void C9()
         }
         if (m[1] == '3')
         {
-          DongCoA = 16;
+          DongCoA = 0;
           DongCoC = 0;
-          A16();
         }
       }
     }
   }  
-}
-
-void A16() //về vị trí ban nãy
-{
-  while(DongCoA == 16) //về lại vị trí ban nãy
-  {
-    stepperA.moveTo(q);
-    stepperA.run();
-    q = 0;
-    if (stepperA.distanceToGo() == 0)
-    {
-      DongCoA = 0;
-    }
-  }
 }
 
 void Check_Humility()
@@ -281,7 +281,7 @@ void Check_Humility()
       DongCoB = 0;
     }
   }  
-  z += 1;
+  z = 10; //1
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -293,6 +293,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -311,18 +312,20 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 20; //2
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
   {
     stepperC.moveTo(truc3);
     stepperC.run();
+    SendH();
     if (stepperC.distanceToGo() == 0)
     {
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -341,7 +344,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 30; //3
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -353,6 +356,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -371,7 +375,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 40; //4
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -383,6 +387,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -401,7 +406,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 50; //5
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -413,6 +418,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -441,7 +447,7 @@ void Check_Humility()
       DongCoB = 0;
     }
   }
-  z += 1;
+  z = 60; //6
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -453,6 +459,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -471,7 +478,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 70; //7
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -483,6 +490,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -501,7 +509,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 80; //8
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -513,6 +521,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -531,7 +540,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 90; //9
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -543,6 +552,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -561,7 +571,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 01; //10 
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -573,6 +583,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -601,7 +612,7 @@ void Check_Humility()
       DongCoB = 0;
     }
   }
-  z += 1;
+  z = 11; //11
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -613,6 +624,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -631,7 +643,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 21; //12
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -643,6 +655,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -661,7 +674,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 31; //13
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -673,6 +686,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -691,7 +705,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 41; //14
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -703,6 +717,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -721,7 +736,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 51; //15
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -733,6 +748,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -761,7 +777,7 @@ void Check_Humility()
       DongCoB = 0;
     }
   }
-  z += 1;
+  z = 61; //16
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -773,6 +789,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -791,7 +808,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 71; //17
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -803,6 +820,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -821,7 +839,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 81; //18
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -833,6 +851,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -851,7 +870,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 91; //19
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -863,6 +882,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -881,7 +901,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 02; //20
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -893,6 +913,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -921,7 +942,7 @@ void Check_Humility()
       DongCoB = 0;
     }
   }
-  z += 1;
+  z = 12; //21
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -933,6 +954,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -951,7 +973,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 22; //22
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -963,6 +985,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -981,7 +1004,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 32; //23
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -993,6 +1016,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -1011,7 +1035,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 42; //24
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -1023,6 +1047,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -1041,7 +1066,7 @@ void Check_Humility()
       DongCoA = 0;
     }
   }
-  z += 1;
+  z = 52; //25
   DongCoC = 5;
   C5();
   while(DongCoC == 8) 
@@ -1053,6 +1078,7 @@ void Check_Humility()
       DongCoC = 0;
     }
   }
+  SendH();
   while (humid < 70)
   {
     DongCoA = 15;
@@ -1904,12 +1930,13 @@ void loop()
         }
       }
     }
-    if(k[0] == 'f')
+    /*else if(k[0] == 'f')
     {
       k[1] = Serial.read() - 48;
       k[2] = Serial.read() - 48;
       humid = k[1]*10 + k[2];
-    }
+      Serial.print(humid);
+    }*/
   }
 
   if(mySerial.available() > 1)

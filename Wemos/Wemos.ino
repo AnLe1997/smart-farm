@@ -3,11 +3,12 @@
 
 #define Humid     A0
 
-byte m[3];
+byte m[4];
 String growth, size;
 int humi;
 int giatriAnalog;
-int id; //số vị trí
+unsigned char id = 0; //số vị trí
+int pos;
 
 // SSID VÀ PASSWORD KẾT NỐI WIFI
 const char* ssid     = "ATPco";
@@ -25,6 +26,7 @@ void Humility()
   giatriAnalog = analogRead(Humid);
   delay(500);
   humi = map(giatriAnalog, 0, 1023,99,0);
+  Serial.print(id);
   Serial.print(humi);
   Serial.println('%');  
 }
@@ -98,7 +100,7 @@ void UpHumility_ToServer(int id, int humi, double time_late_ms)
 }
 
 //HÀM ĐẨY ĐỘ TĂNG TRƯỞNG LÊN WEBSERVER
-void UpGrowth_ToServer(int id, String growth, double time_late_ms)
+void UpGrowth_ToServer(int pos, String growth, double time_late_ms)
 {
   delay(10);
 
@@ -111,8 +113,8 @@ void UpGrowth_ToServer(int id, String growth, double time_late_ms)
 
   // We now create a URI for the request
   String url = "/hienthi/growth_index.php?";
-  url += "id=";
-  url += id;
+  url += "pos=";
+  url += pos;
   url += "&size=";
   url += size;
 
@@ -895,13 +897,13 @@ void loop()
   	m[0] = Serial.read();
   	if (m[0] == 'h')
   	{
-  	  m[1] = Serial.read();
-      m[2] = Serial.read();
-      id = m[1]*10 + m[2];
+  	  m[1] = Serial.read() - 48;
+      m[2] = Serial.read() - 48;
+      id = m[2]*10 + m[1];
       Humility();
   	  UpHumility_ToServer((int) id, (int) humi, 100);
       Serial.print('f');
-      Serial.print(humi);
+      Serial.println(humi);
     
   	}
   	if (m[0] == 'e')
@@ -913,12 +915,12 @@ void loop()
         if(m[2] == '1')
         {
           size = "small";
-          UpGrowth_ToServer((int) id, (String) growth, 100);
+          UpGrowth_ToServer((int) pos, (String) growth, 100);
         }
         if(m[2] == '2')
         {
           size = "normal";
-          UpGrowth_ToServer((int) id, (String) growth, 100);
+          UpGrowth_ToServer((int) pos, (String) growth, 100);
         }
         if(m[2] == '3')
         {
