@@ -295,7 +295,7 @@ void Servo_Controller()
           Serial.print('4');
           delay(150);
         }
-        if (req.indexOf("20=run") != -1) 
+        if (req.indexOf("20=act") != -1) 
         {
           Serial.print('a');
           Serial.print('4');
@@ -473,7 +473,7 @@ void Servo_Controller()
           Serial.print('4');
           delay(150);
         }
-        if (req.indexOf("20=run") != -1) 
+        if (req.indexOf("20=act") != -1) 
         {
           Serial.print('b');
           Serial.print('4');
@@ -651,7 +651,7 @@ void Servo_Controller()
           Serial.print('4');
           delay(150);
         }
-        if (req.indexOf("20=run") != -1) 
+        if (req.indexOf("20=act") != -1) 
         {
           Serial.print('c');
           Serial.print('4');
@@ -829,7 +829,7 @@ void Servo_Controller()
           Serial.print('4');
           delay(150);
         }
-        if (req.indexOf("20=run") != -1) 
+        if (req.indexOf("20=act") != -1) 
         {
           Serial.print('d');
           Serial.print('4');
@@ -912,20 +912,23 @@ void loop()
       if(m[1] == '1')
       {
         m[2] = Serial.read();
-        if(m[2] == '1')
+        for(pos = 1; pos < 26; pos++)
         {
-          size = "small";
-          UpGrowth_ToServer((int) pos, (String) growth, 100);
-        }
-        if(m[2] == '2')
-        {
-          size = "normal";
-          UpGrowth_ToServer((int) pos, (String) growth, 100);
-        }
-        if(m[2] == '3')
-        {
-          size = "big";
-          UpGrowth_ToServer((int) id, (String) growth, 100);
+          if(m[2] == '1')
+          {
+            size = "small";
+            UpGrowth_ToServer((int) pos, (String) growth, 100);
+          }
+          if(m[2] == '2')
+          {
+            size = "normal";
+            UpGrowth_ToServer((int) pos, (String) growth, 100);
+          }
+          if(m[2] == '3')
+          {
+            size = "big";
+            UpGrowth_ToServer((int) pos, (String) growth, 100);
+          }
         }
       }
   	}

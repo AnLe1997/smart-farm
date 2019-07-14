@@ -5,8 +5,8 @@
 
 #define check         A0
 #define magneticS3    A1
-#define magneticS2    A2
 #define magneticS1    A3
+#define magneticS2    A2
 
 SoftwareSerial mySerial(8,9); //Rx, Tx
 
@@ -1103,13 +1103,24 @@ void loop()
   {
     count = 0;
     Serial.println(270*x);
-    Serial.println(270*y);
-    stepperA.moveTo(270*x);
+    Serial.println(550*y);
+    Return_Zero();
+    stepperA.moveTo(270*x + truc1);
     stepperA.run();
-    delay(4000);
-    stepperB.moveTo(550*y);
-    stepperB.run();
+    if (y < 60)
+    {
+      stepperB.moveTo(550*y + truc2);
+      stepperB.run();
+    }
+    else
+    {
+      stepperB.moveTo(-550*y + truc2);
+      stepperB.run();
+    }
+    stepperC.moveTo(doam + truc3);
+    stepperC.run();
     x = y = 0;
+    Return_Zero();
   }
 
   if (p == 1)
